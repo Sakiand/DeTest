@@ -1,5 +1,6 @@
 from psycopg2 import pool
 
+#connection pool
 class Database:
     __connection_pool = None
 

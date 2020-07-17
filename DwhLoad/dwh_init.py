@@ -2,6 +2,8 @@ from configparser import ConfigParser
 from DwhLoad.db_pool import CursorFromConnectionFromPool, Database
 import os
 
+
+#create schemas and tables
 parser = ConfigParser()
 parser.read('config.ini')
 

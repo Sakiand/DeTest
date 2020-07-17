@@ -7,8 +7,9 @@ from flask_marshmallow import Marshmallow
 from sqlalchemy.ext.declarative import declarative_base
 import os
 
-Base = declarative_base()
 
+#data models orm (abstraction layer)
+Base = declarative_base()
 parser = ConfigParser()
 parser.read('config.ini')
 RS_PORT = parser.get('Redshift', 'port')

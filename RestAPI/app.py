@@ -8,6 +8,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from RestAPI.models import Merchant, Payments, PaymentStatus
 import os
 
+
+#rest calls
 Base = declarative_base()
 parser = ConfigParser()
 parser.read('config.ini')
