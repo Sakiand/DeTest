@@ -1,0 +1,1 @@
+select to_ts from mrr_merchants.manage_sources where table_name = '{tableName}';

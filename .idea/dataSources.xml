@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+    <data-source source="LOCAL" name="a4a" uuid="c3066fcf-81ca-47a1-bb26-2e8fa0eb64bd">
+      <driver-ref>redshift</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.amazon.redshift.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:redshift://dimitri-sakian.cvxskdimz7fh.us-west-2.redshift.amazonaws.com:5439/a4a</jdbc-url>
+    </data-source>
+  </component>
+</project>
