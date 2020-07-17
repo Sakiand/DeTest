@@ -3,7 +3,6 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, String, DateTime, Numeric, ForeignKey
-from flask_marshmallow import Marshmallow
 from sqlalchemy.ext.declarative import declarative_base
 import os
 
@@ -26,8 +25,6 @@ app.config[
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-ma = Marshmallow(app)
-
 
 # database models
 class PaymentMethod(db.Model):

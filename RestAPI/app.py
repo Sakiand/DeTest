@@ -2,7 +2,6 @@ from configparser import ConfigParser
 
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from flask_marshmallow import Marshmallow
 from sqlalchemy import func
 from sqlalchemy.ext.declarative import declarative_base
 from RestAPI.models import Merchant, Payments, PaymentStatus
@@ -28,7 +27,6 @@ app.config[
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-ma = Marshmallow(app)
 
 # to create requirements file pip freeze > requirements.txt
 
