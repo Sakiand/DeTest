@@ -103,21 +103,38 @@ def load_payments_data():
                 from_ts=from_ts))
         payment_dates_to_load = tuple([d[0].strftime("%Y-%m-%d") for d in cursor.fetchall()])
         if len(payment_dates_to_load) > 0:
-            payment_dates_to_load = str(payment_dates_to_load)
-            delete_statement = 'delete from merchants.fact_payments where payment_date in {dates};'.format(
-                dates=payment_dates_to_load)
-            print(delete_statement)
-            cursor.execute(delete_statement)
-            print(str(cursor.rowcount) + ' rows deleted')
             cursor.execute(
-                'insert into merchants.fact_payments(payment_id, merchant_fk, payment_method_fk, payment_status_fk, payment_date, payment_amount, ingestion_date) ' \
-                'select payment_id, coalesce(dm.merchant_pk,-1), dpm.payment_method_pk, dps.payment_status_pk, payment_date, payment_amount, ingestion_date  ' \
+                'create temp table stg_fact_payments as ' \
+                'select payment_id, coalesce(dm.merchant_pk,-1) as merchant_fk, dpm.payment_method_pk, dps.payment_status_pk, payment_date, payment_amount, ingestion_date, fp.merchant_id  ' \
                 'from mrr_merchants.payments fp ' \
                 'left join merchants.dim_payment_method dpm on fp.payment_method = dpm.payment_method_name ' \
                 'left join merchants.dim_payment_status dps on fp.status = dps.payment_status_name ' \
                 'left join merchants.dim_merchant dm on fp.merchant_id = dm.merchant_id and fp.payment_date >= dm.from_date and fp.payment_date <= dm.to_date ' \
                 'where payment_date in {dates};'.format(dates=payment_dates_to_load) \
                 )
+
+            #for late arriving merchants attribute data
+            cursor.execute('insert into merchants.dim_merchant(merchant_id, merchant_name, address, phone_number, email, from_date, to_date) ' \
+                           'select  merchant_id, \'unknown\', \'unknown\', \'unknown\', \'unknown\',min(ingestion_date), max(ingestion_date)' \
+                           'from stg_fact_payments where merchant_fk = -1 ' \
+                           'group by merchant_id;'
+                           )
+            payment_dates_to_load = str(payment_dates_to_load)
+
+            delete_statement = 'delete from merchants.fact_payments where payment_date in {dates};'.format(
+                dates=payment_dates_to_load)
+            print(delete_statement)
+            cursor.execute(delete_statement)
+            print(str(cursor.rowcount) + ' rows deleted')
+
+            cursor.execute(
+                'insert into merchants.fact_payments(payment_id, merchant_fk, payment_method_fk, payment_status_fk, payment_date, payment_amount)  ' \
+                'select payment_id, merchant_pk, payment_method_pk, payment_status_pk, payment_date, payment_amount ' \
+                'from stg_fact_payments fp ' \
+                'join merchants.dim_merchant dm on fp.merchant_id = dm.merchant_id and '
+                'fp.payment_date >= dm.from_date and fp.payment_date <= dm.to_date;' \
+                )
+
             print("payments table loaded succesfully with " + str(cursor.rowcount) + ' rows')
             cursor.execute('select distinct max(ingestion_date) from mrr_merchants.payments '
                            'where ingestion_date > \'{from_ts}\';'.format(from_ts=get_from_ts('merchants.payments')))
